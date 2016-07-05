@@ -1,21 +1,23 @@
 package com.outwit.edoctor.infrastructure.exception;
 
+import com.outwit.edoctor.infrastructure.Term.StatusCode;
+
 import java.util.Map;
 
 public class ApplicationException extends RuntimeException {
-    private ErrorCode errorCode;
+    private StatusCode statusCode;
     private Map<String, Object> properties;
 
-    public ApplicationException(ErrorCode errorCode){
-        this.errorCode = errorCode;
+    public ApplicationException(StatusCode statusCode){
+        this.statusCode = statusCode;
     }
 
-    public ErrorCode getErrorCode() {
-        return errorCode;
+    public StatusCode getStatusCode() {
+        return statusCode;
     }
 
-    public ApplicationException setErrorCode(ErrorCode errorCode) {
-        this.errorCode = errorCode;
+    public ApplicationException setStatusCode(StatusCode statusCode) {
+        this.statusCode = statusCode;
         return this;
     }
 

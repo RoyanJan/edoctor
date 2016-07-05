@@ -1,7 +1,10 @@
 package com.outwit.edoctor.infrastructure.exception;
 
-public enum SystemCode implements ErrorCode {
-    ;
+import com.outwit.edoctor.infrastructure.Term.StatusCode;
+
+public enum SystemCode implements StatusCode {
+
+    INTERNAL_ERROR(500);
 
     private final int number;
 
