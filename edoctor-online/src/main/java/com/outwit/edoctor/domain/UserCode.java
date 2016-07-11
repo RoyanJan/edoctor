@@ -1,15 +1,14 @@
-package com.outwit.edoctor.infrastructure.exception;
+package com.outwit.edoctor.domain;
 
 import com.outwit.edoctor.infrastructure.Term.StatusCode;
 
-public enum SystemCode implements StatusCode {
+public enum UserCode implements StatusCode {
 
-    INTERNAL_ERROR(500),
-    REMOTE_PROCESS_ERROR(501);
+    REPEAT_SEND(100);
 
     private int number;
 
-    SystemCode(int number){
+    UserCode(int number) {
         this.number = number;
     }
 
