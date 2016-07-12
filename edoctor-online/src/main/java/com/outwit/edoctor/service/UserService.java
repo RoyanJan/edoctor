@@ -2,6 +2,6 @@ package com.outwit.edoctor.service;
 
 public interface UserService {
 
-
-    public void sendVerifyCode(String sessionId);
+    int VERIFYCODE_EXPIRE_SECONDS = 60;
+    void sendVerifyCode(String sessionId);
 }

@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service("userService")
-public class UserServiceImpl implements UserService{
+public class UserServiceImpl implements UserService {
 
     @Autowired
     private RedisService redisService;
@@ -21,16 +21,16 @@ public class UserServiceImpl implements UserService{
 
     @Override
     public void sendVerifyCode(String sessionId) {
-        if(redisService.isCached(sessionId)){
+        if (redisService.isCached(sessionId)) {
             log.debug("User session id : " + sessionId + ", has send verify code repeatably .");
             throw new ApplicationException(UserCode.REPEAT_SEND);
         }
         String verifyCode = VerifyCodeGenerator.generatorVerifyCode();
         log.debug("User session id : " + sessionId + ", fetch verify code :" + verifyCode);
         try {
-            redisService.cacheIt(sessionId, verifyCode);
+            redisService.cacheIt(sessionId, verifyCode, VERIFYCODE_EXPIRE_SECONDS);
             smsService.sendMessage(verifyCode);
-        } catch (Exception e){
+        } catch (Exception e) {
             log.error("redis server or remote sms ");
             throw new ApplicationException(SystemCode.REMOTE_PROCESS_ERROR);
         }
