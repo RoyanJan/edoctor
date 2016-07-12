@@ -1,9 +1,11 @@
 package com.outwit.edoctor.service;
 
+import com.outwit.edoctor.domain.User;
 import com.outwit.edoctor.domain.UserCode;
 import com.outwit.edoctor.infrastructure.cache.RedisService;
 import com.outwit.edoctor.infrastructure.exception.ApplicationException;
 import com.outwit.edoctor.infrastructure.exception.SystemCode;
+import com.outwit.edoctor.infrastructure.mapper.UserMapper;
 import com.outwit.edoctor.infrastructure.sms.SMSService;
 import com.outwit.edoctor.infrastructure.utils.VerifyCodeGenerator;
 import lombok.extern.slf4j.Slf4j;
@@ -18,22 +20,45 @@ public class UserServiceImpl implements UserService {
     private RedisService redisService;
     @Autowired
     private SMSService smsService;
+    @Autowired
+    private UserMapper userMapper;
 
     @Override
-    public void sendVerifyCode(String sessionId) {
-        if (redisService.isCached(sessionId)) {
-            log.debug("User session id : " + sessionId + ", has send verify code repeatably .");
+    public void sendVerifyCode(String sessionId, String telephone) {
+        if (redisService.isCached(sessionId) || redisService.isCached(telephone)) {
+            log.error("User session id : " + sessionId + " telephone : " + telephone + ", has send verify code repeatably .");
             throw new ApplicationException(UserCode.REPEAT_SEND);
         }
         String verifyCode = VerifyCodeGenerator.generatorVerifyCode();
-        log.debug("User session id : " + sessionId + ", fetch verify code :" + verifyCode);
+        log.info("User session id : " + sessionId + " telephone : " + telephone + ", fetch verify code :" + verifyCode);
         try {
-            redisService.cacheIt(sessionId, verifyCode, VERIFYCODE_EXPIRE_SECONDS);
+            redisService.cacheIt(telephone, verifyCode, VERIFYCODE_EXPIRE_SECONDS);
+            redisService.cacheIt(sessionId, "active", VERIFYCODE_EXPIRE_SECONDS);
             smsService.sendMessage(verifyCode);
         } catch (Exception e) {
             log.error("redis server or remote sms ");
             throw new ApplicationException(SystemCode.REMOTE_PROCESS_ERROR);
         }
-        log.debug("User session id : " + sessionId + "sent verify code successfully");
+        log.info("User session id : " + sessionId + " telephone : " + telephone + " sent verify code successfully");
+    }
+
+    @Override
+    public boolean verifyCode(String telephone, String code) {
+        return redisService.getValue(telephone).equals(code);
+    }
+
+    @Override
+    public void createUser(User user) {
+
+        if (isUserExist(user)) {
+            log.error("Telephone " + user.getTelephone() + " has already registed !");
+            throw new ApplicationException(UserCode.REPEAT_USER);
+        }
+        userMapper.createUser(user);
+        log.info("Telephone " + user.getTelephone() + " regist successfully .");
+    }
+
+    private boolean isUserExist(User user) {
+        return userMapper.hasUser(user.getTelephone()) > 0;
     }
 }

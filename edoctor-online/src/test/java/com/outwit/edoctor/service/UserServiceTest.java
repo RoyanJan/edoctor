@@ -20,6 +20,6 @@ public class UserServiceTest {
 
     @Test
     public void test() {
-        userService.sendVerifyCode("sessionid0001");
+//        userService.sendVerifyCode("sessionid0001");
     }
 }

@@ -23,6 +23,7 @@ public class ErrorHandler {
         if (ex instanceof ApplicationException) {
             applicationException = (ApplicationException) ex;
         } else {
+            // TODO 底层异常为未捕获完全
             applicationException = new ApplicationException(ex.getMessage(), ex, SystemCode.INTERNAL_ERROR);
         }
         log.error(applicationException.getMessage());

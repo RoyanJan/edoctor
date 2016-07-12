@@ -13,12 +13,16 @@ public class RedisServiceImpl implements RedisService {
     @Autowired
     private StringRedisTemplate redisTemplate;
 
-    public boolean isCached(String key) {
+    public boolean isCached(final String key) {
         return redisTemplate.hasKey(key);
     }
 
-    public void cacheIt(String key, String value, int timeout) {
+    public void cacheIt(final String key, final String value, final int timeout) {
         redisTemplate.opsForValue().set(key, value);
         redisTemplate.expire(key, timeout, TimeUnit.SECONDS);
+    }
+
+    public String getValue(final String key){
+        return redisTemplate.opsForValue().get(key);
     }
 }
