@@ -7,6 +7,6 @@ public class SMSServiceImpl implements SMSService {
 
     @Override
     public void sendMessage(String msg) {
-
+        // TODO 调用短信平台
     }
 }

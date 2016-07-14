@@ -9,11 +9,12 @@ public class ApplicationException extends RuntimeException {
     private StatusCode statusCode;
     private Map<String, Object> properties;
 
-    public ApplicationException(StatusCode statusCode){
-        this(null,null,statusCode);
+    public ApplicationException(StatusCode statusCode) {
+        this(null, null, statusCode);
     }
-    public ApplicationException(String message,Throwable e,StatusCode statusCode){
-        super(message,e);
+
+    public ApplicationException(String message, Throwable e, StatusCode statusCode) {
+        super(message, e);
         this.statusCode = statusCode;
     }
 

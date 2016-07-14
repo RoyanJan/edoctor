@@ -11,4 +11,6 @@ public interface UserService {
     void createUser(User user);
 
     boolean verifyCode(String telephone, String code);
+
+    User findUserByTelephone(String telephone);
 }

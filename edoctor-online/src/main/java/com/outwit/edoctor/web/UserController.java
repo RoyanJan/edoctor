@@ -6,6 +6,7 @@ import com.outwit.edoctor.domain.UserType;
 import com.outwit.edoctor.infrastructure.Term.Interaction;
 import com.outwit.edoctor.infrastructure.exception.ApplicationException;
 import com.outwit.edoctor.infrastructure.utils.UUIDGenerator;
+import com.outwit.edoctor.infrastructure.utils.PasswordHelper;
 import com.outwit.edoctor.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,12 +44,14 @@ public class UserController {
     }
 
     private User buildUser(RegisterDTO registerDTO) {
+        String randomSalt = UUIDGenerator.generateUUID();
         User user = new User();
         user.setId(UUIDGenerator.generateUUID());
         user.setTelephone(registerDTO.getTelephone());
         user.setName(user.getId());
         user.setType(registerDTO.getIsUser() ? UserType.NORMAL : UserType.DOCTOR);
-        // TODO password & salt
+        user.setPassword(new PasswordHelper().encryptPassword(registerDTO.getPlainTextPassword() + randomSalt));
+        user.setSalt(randomSalt);
         user.setCreateDate(new Date());
         user.setLastAccess(new Date());
         return user;

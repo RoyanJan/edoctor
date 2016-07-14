@@ -58,6 +58,11 @@ public class UserServiceImpl implements UserService {
         log.info("Telephone " + user.getTelephone() + " regist successfully .");
     }
 
+    @Override
+    public User findUserByTelephone(String telephone) {
+        return userMapper.fetchUser(telephone);
+    }
+
     private boolean isUserExist(User user) {
         return userMapper.hasUser(user.getTelephone()) > 0;
     }

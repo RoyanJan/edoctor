@@ -9,4 +9,6 @@ public interface UserMapper {
     int hasUser(String telephone);
 
     void createUser(User user);
+
+    User fetchUser(String telephone);
 }

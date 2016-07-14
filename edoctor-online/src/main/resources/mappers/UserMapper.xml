@@ -12,6 +12,9 @@
     <select id="hasUser" resultType="java.lang.Integer" parameterType="string">
         SELECT COUNT(*) FROM t_user WHERE telephone = #{telephone}
     </select>
+    <select id="fetchUser" resultType="com.outwit.edoctor.domain.User">
+        SELECT * FROM t_user WHERE telephone = #{telephone}
+    </select>
 
 
 </mapper>

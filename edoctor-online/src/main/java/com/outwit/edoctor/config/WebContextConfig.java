@@ -5,10 +5,12 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.support.ResourceBundleMessageSource;
+import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
 @Configuration
-@ComponentScan
-public class WebContextConfig {
+@ComponentScan(basePackages = "com.outwit.edoctor")
+public class WebContextConfig extends WebMvcConfigurerAdapter {
 
     @Bean
     public MessageSource messageSource() {
@@ -18,5 +20,6 @@ public class WebContextConfig {
         });
         return messageSource;
     }
+
 
 }

@@ -9,8 +9,6 @@ public class HomeController {
 
     @RequestMapping(value = "/", method = RequestMethod.GET)
     public String home() {
-        if (1 == 1)
-            throw new RuntimeException("fuck exception");
-        return "Hello E doctor - OutwitIdea";
+        return "Hello E doctor - OutwitIdea com.";
     }
 }
