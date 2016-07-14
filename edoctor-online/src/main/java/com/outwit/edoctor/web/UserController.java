@@ -5,10 +5,15 @@ import com.outwit.edoctor.domain.UserCode;
 import com.outwit.edoctor.domain.UserType;
 import com.outwit.edoctor.infrastructure.Term.Interaction;
 import com.outwit.edoctor.infrastructure.exception.ApplicationException;
-import com.outwit.edoctor.infrastructure.utils.UUIDGenerator;
 import com.outwit.edoctor.infrastructure.utils.PasswordHelper;
+import com.outwit.edoctor.infrastructure.utils.UUIDGenerator;
 import com.outwit.edoctor.service.UserService;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.catalina.security.SecurityUtil;
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.authc.AuthenticationException;
+import org.apache.shiro.authc.UsernamePasswordToken;
+import org.apache.shiro.subject.Subject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -41,6 +46,21 @@ public class UserController {
         userService.createUser(user);
         log.debug("create user successfully .");
         return new Interaction(UserCode.REGIST_SUCCESS, "Regist successfully .");
+    }
+
+    @RequestMapping(path = "login", method = RequestMethod.POST)
+    public Interaction login(@ModelAttribute RegisterDTO registerDTO){
+        Subject subject = SecurityUtils.getSubject();
+        UsernamePasswordToken token = new UsernamePasswordToken();
+        token.setUsername(registerDTO.getTelephone());
+        token.setPassword(registerDTO.getPlainTextPassword().toCharArray());
+        try {
+            subject.login(token);
+            // TODO 角色信息
+        } catch (AuthenticationException e) {
+            throw new ApplicationException("Login failed !",e,UserCode.LOGIN_FAILURE);
+        }
+        return new Interaction(UserCode.LOGIN_SUCCESS,"Login successfully");
     }
 
     private User buildUser(RegisterDTO registerDTO) {

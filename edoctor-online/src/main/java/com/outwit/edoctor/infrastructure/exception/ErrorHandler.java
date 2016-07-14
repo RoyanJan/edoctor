@@ -26,7 +26,7 @@ public class ErrorHandler {
             // TODO 底层异常为未捕获完全
             applicationException = new ApplicationException(ex.getMessage(), ex, SystemCode.INTERNAL_ERROR);
         }
-        log.error(applicationException.getMessage());
+        log.info(applicationException.getMessage());
         return new Interaction(applicationException.getStatusCode(), messageSource.getMessage(String.valueOf(applicationException.getStatusCode()), null, null));
     }
 }
