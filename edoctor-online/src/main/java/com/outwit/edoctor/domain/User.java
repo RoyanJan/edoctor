@@ -2,7 +2,7 @@ package com.outwit.edoctor.domain;
 
 import lombok.Data;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Data
 public class User {
@@ -13,7 +13,7 @@ public class User {
     private UserType type;
     private String password;
     private String salt;
-    private Date createDate;
-    private Date lastAccess;
+    private LocalDateTime createDate;
+    private LocalDateTime lastAccess;
 
 }

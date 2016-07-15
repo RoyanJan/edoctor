@@ -9,7 +9,6 @@ import com.outwit.edoctor.infrastructure.utils.PasswordHelper;
 import com.outwit.edoctor.infrastructure.utils.UUIDGenerator;
 import com.outwit.edoctor.service.UserService;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.catalina.security.SecurityUtil;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.UsernamePasswordToken;
@@ -18,6 +17,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Slf4j
@@ -49,18 +50,18 @@ public class UserController {
     }
 
     @RequestMapping(path = "login", method = RequestMethod.POST)
-    public Interaction login(@ModelAttribute RegisterDTO registerDTO){
+    public Interaction login(@ModelAttribute RegisterDTO registerDTO) {
         Subject subject = SecurityUtils.getSubject();
         UsernamePasswordToken token = new UsernamePasswordToken();
         token.setUsername(registerDTO.getTelephone());
         token.setPassword(registerDTO.getPlainTextPassword().toCharArray());
         try {
             subject.login(token);
-            // TODO 角色信息
+            // TODO 角色信息 & 最近登录
         } catch (AuthenticationException e) {
-            throw new ApplicationException("Login failed !",e,UserCode.LOGIN_FAILURE);
+            throw new ApplicationException("Login failed !", e, UserCode.LOGIN_FAILURE);
         }
-        return new Interaction(UserCode.LOGIN_SUCCESS,"Login successfully");
+        return new Interaction(UserCode.LOGIN_SUCCESS, "Login successfully");
     }
 
     private User buildUser(RegisterDTO registerDTO) {
@@ -72,8 +73,8 @@ public class UserController {
         user.setType(registerDTO.getIsUser() ? UserType.NORMAL : UserType.DOCTOR);
         user.setPassword(new PasswordHelper().encryptPassword(registerDTO.getPlainTextPassword() + randomSalt));
         user.setSalt(randomSalt);
-        user.setCreateDate(new Date());
-        user.setLastAccess(new Date());
+        user.setCreateDate(LocalDateTime.now());
+        user.setLastAccess(LocalDateTime.now());
         return user;
     }
 

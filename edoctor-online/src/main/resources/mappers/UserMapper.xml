@@ -4,7 +4,7 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.outwit.edoctor.infrastructure.mapper.UserMapper">
 
-    <insert id="createUser" parameterType="com.outwit.edoctor.domain.User">
+    <insert id="createUser" parameterType="User">
         INSERT INTO t_user (id,name,telephone,type,password,salt,create_date,last_access)
               VALUES (#{id},#{name},#{telephone},#{type},#{password},#{salt},#{createDate},#{lastAccess})
     </insert>
@@ -12,7 +12,9 @@
     <select id="hasUser" resultType="java.lang.Integer" parameterType="string">
         SELECT COUNT(*) FROM t_user WHERE telephone = #{telephone}
     </select>
-    <select id="fetchUser" resultType="com.outwit.edoctor.domain.User">
+
+
+    <select id="fetchUser" resultType="User">
         SELECT * FROM t_user WHERE telephone = #{telephone}
     </select>
 

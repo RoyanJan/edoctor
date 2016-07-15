@@ -2,6 +2,7 @@ package com.outwit.edoctor.service;
 
 import com.outwit.edoctor.Application;
 import com.outwit.edoctor.config.WebContextConfig;
+import com.outwit.edoctor.domain.User;
 import org.apache.catalina.security.SecurityUtil;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.UsernamePasswordToken;
@@ -26,10 +27,7 @@ public class UserServiceTest {
 
     @Test
     public void test() {
-//        userService.sendVerifyCode("sessionid0001");
-        Subject subject = SecurityUtils.getSubject();
-        UsernamePasswordToken token = new UsernamePasswordToken("18510247299","jcy");
-        subject.login(token);
-        assertTrue(subject.isAuthenticated());
+        User user = userService.findUserByTelephone("18510247299");
+        System.out.println(user.toString());
     }
 }
