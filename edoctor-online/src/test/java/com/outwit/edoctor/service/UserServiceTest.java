@@ -23,7 +23,6 @@ public class UserServiceTest {
 
     @Test
     public void test() {
-        User user = userService.findUserByTelephone("18510247299");
-        System.out.println(user.toString());
+        System.out.println(userService.findRoles("18510247299"));
     }
 }

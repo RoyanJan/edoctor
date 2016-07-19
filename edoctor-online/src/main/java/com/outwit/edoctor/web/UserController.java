@@ -9,7 +9,6 @@ import com.outwit.edoctor.infrastructure.utils.PasswordHelper;
 import com.outwit.edoctor.infrastructure.utils.UUIDGenerator;
 import com.outwit.edoctor.service.UserService;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.catalina.security.SecurityUtil;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.UsernamePasswordToken;
@@ -36,54 +35,68 @@ public class UserController {
     }
 
     @RequestMapping(path = "/user", method = RequestMethod.POST)
-    public Interaction regist(@ModelAttribute RegisterDTO registerDTO) {
-        log.debug("register vo content : " + registerDTO.toString());
-        if (!userService.verifyCode(registerDTO.getTelephone(), registerDTO.getVerifyCode())) {
+    public Interaction regist(@ModelAttribute AuthenticationDTO authenticationDTO) {
+        log.debug("register vo content : " + authenticationDTO.toString());
+        if (!userService.verifyCode(authenticationDTO.getTelephone(), authenticationDTO.getVerifyCode())) {
             throw new ApplicationException(UserCode.VERIFY_FAILURE);
         }
         log.debug("verify code successfully .");
-        User user = buildUser(registerDTO);
+        User user = buildUser(authenticationDTO);
         userService.createUser(user);
         log.debug("create user successfully .");
         return new Interaction(UserCode.REGIST_SUCCESS, "Regist successfully .");
     }
 
     @RequestMapping(path = "/login", method = RequestMethod.GET)
-    public Interaction loginInfo(){
-        return new Interaction(UserCode.LOGIN_FAILURE,"Please login again .");
+    public Interaction authenticateInfo() {
+        return new Interaction(UserCode.LOGIN_FAILURE, "Please login again .");
     }
 
     @RequestMapping(path = "/login", method = RequestMethod.POST)
-    public Interaction login(@ModelAttribute RegisterDTO registerDTO) {
+    public Interaction login(@ModelAttribute AuthenticationDTO authenticationDTO) {
         Subject subject = SecurityUtils.getSubject();
         UsernamePasswordToken token = new UsernamePasswordToken();
-        token.setUsername(registerDTO.getTelephone());
-        token.setPassword(registerDTO.getPlainTextPassword().toCharArray());
+        token.setUsername(authenticationDTO.getTelephone());
+        token.setPassword(authenticationDTO.getPlainTextPassword().toCharArray());
         token.setRememberMe(true);
         try {
             subject.login(token);
-            // TODO 角色信息 & 最近登录
+            // TODO 最近登录
         } catch (AuthenticationException e) {
             throw new ApplicationException("Login failed !", e, UserCode.LOGIN_FAILURE);
         }
         return new Interaction(UserCode.LOGIN_SUCCESS, "Login successfully");
     }
 
-    @RequestMapping(path = "/logout",method = RequestMethod.GET)
-    public Interaction logout(){
+    @RequestMapping(path = "/logout", method = RequestMethod.GET)
+    public Interaction logout() {
         Subject subject = SecurityUtils.getSubject();
         subject.logout();
-        return new Interaction(UserCode.LOGOUT_SUCCESS,"Logout successfully");
+        return new Interaction(UserCode.LOGOUT_SUCCESS, "Logout successfully");
     }
 
-    private User buildUser(RegisterDTO registerDTO) {
+    @RequestMapping(path = "/user/password", method = RequestMethod.PUT)
+    public Interaction forgetPassword(@ModelAttribute AuthenticationDTO authenticationDTO) {
+        if (!userService.verifyCode(authenticationDTO.getTelephone(), authenticationDTO.getVerifyCode())) {
+            throw new ApplicationException(UserCode.VERIFY_FAILURE);
+        }
+        User user = new User();
+        user.setTelephone(authenticationDTO.getTelephone());
+        String randomSalt = UUIDGenerator.generateUUID();
+        user.setSalt(randomSalt);
+        user.setPassword(new PasswordHelper().encryptPassword(authenticationDTO.getPlainTextPassword() + randomSalt));
+        userService.changePassword(user);
+        return new Interaction(UserCode.REGIST_SUCCESS, "Change successfully");
+    }
+
+    private User buildUser(AuthenticationDTO authenticationDTO) {
         String randomSalt = UUIDGenerator.generateUUID();
         User user = new User();
         user.setId(UUIDGenerator.generateUUID());
-        user.setTelephone(registerDTO.getTelephone());
+        user.setTelephone(authenticationDTO.getTelephone());
         user.setName(user.getId());
-        user.setType(registerDTO.getIsUser() ? UserType.NORMAL : UserType.DOCTOR);
-        user.setPassword(new PasswordHelper().encryptPassword(registerDTO.getPlainTextPassword() + randomSalt));
+        user.setType(authenticationDTO.getIsUser() ? UserType.NORMAL : UserType.DOCTOR);
+        user.setPassword(new PasswordHelper().encryptPassword(authenticationDTO.getPlainTextPassword() + randomSalt));
         user.setSalt(randomSalt);
         user.setCreateDate(LocalDateTime.now());
         user.setLastAccess(LocalDateTime.now());

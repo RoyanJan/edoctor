@@ -12,6 +12,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Set;
+import java.util.stream.Collectors;
+
 @Slf4j
 @Service("userService")
 public class UserServiceImpl implements UserService {
@@ -61,6 +64,22 @@ public class UserServiceImpl implements UserService {
     @Override
     public User findUserByTelephone(String telephone) {
         return userMapper.fetchUser(telephone);
+    }
+
+    @Override
+    public Set<String> findRoles(String telephone) {
+        return userMapper.fetchRoles(telephone)
+                .stream().map(Enum::toString).collect(Collectors.toSet());
+    }
+
+    @Override
+    public void changePassword(User user) {
+        if (!isUserExist(user)) {
+            log.error("Telephone " + user.getTelephone() + " is not exist !");
+            throw new ApplicationException(UserCode.NOT_EXIST);
+        }
+        userMapper.updateUserPassword(user);
+        log.info("Telephone " + user.getTelephone() + " change password successfully .");
     }
 
     private boolean isUserExist(User user) {

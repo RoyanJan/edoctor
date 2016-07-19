@@ -9,6 +9,10 @@
               VALUES (#{id},#{name},#{telephone},#{type},#{password},#{salt},#{createDate},#{lastAccess})
     </insert>
 
+    <update id="updateUserPassword" parameterType="User">
+        UPDATE t_user SET password = #{password},salt = #{salt} WHERE telephone = #{telephone}
+    </update>
+
     <select id="hasUser" resultType="java.lang.Integer" parameterType="string">
         SELECT COUNT(*) FROM t_user WHERE telephone = #{telephone}
     </select>
@@ -16,6 +20,10 @@
 
     <select id="fetchUser" resultType="User">
         SELECT * FROM t_user WHERE telephone = #{telephone}
+    </select>
+
+    <select id="fetchRoles" resultType="com.outwit.edoctor.domain.UserType">
+        SELECT type FROM t_user WHERE telephone = #{telephone}
     </select>
 
 

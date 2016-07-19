@@ -5,7 +5,7 @@ import lombok.Data;
 import java.io.Serializable;
 
 @Data
-public class RegisterDTO implements Serializable {
+public class AuthenticationDTO implements Serializable {
 
     private String telephone;
     private String plainTextPassword;

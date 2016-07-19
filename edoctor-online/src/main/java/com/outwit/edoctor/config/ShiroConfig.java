@@ -50,7 +50,7 @@ public class ShiroConfig {
         shiroFilter.setFilterChainDefinitions(
                 "/=anon \n"
                         + "/verifyCode/**=anon \n"
-                        + "/**=user \n"
+//                        + "/**=user \n"
         );
         return shiroFilter;
     }
@@ -72,9 +72,17 @@ public class ShiroConfig {
 
     @Bean
     public AuthorizationAttributeSourceAdvisor getAuthorizationAttributeSourceAdvisor() {
-        AuthorizationAttributeSourceAdvisor aasa = new AuthorizationAttributeSourceAdvisor();
-        aasa.setSecurityManager(getSecurityManager());
-        return new AuthorizationAttributeSourceAdvisor();
+        AuthorizationAttributeSourceAdvisor authorizationAttributeSourceAdvisor = new AuthorizationAttributeSourceAdvisor();
+        authorizationAttributeSourceAdvisor.setSecurityManager(getSecurityManager());
+        return authorizationAttributeSourceAdvisor;
+    }
+
+    @Bean
+    @DependsOn("lifecycleBeanPostProcessor")
+    public DefaultAdvisorAutoProxyCreator getDefaultAdvisorAutoProxyCreator() {
+        DefaultAdvisorAutoProxyCreator defaultAdvisorAutoProxyCreator = new DefaultAdvisorAutoProxyCreator();
+        defaultAdvisorAutoProxyCreator.setProxyTargetClass(true);
+        return defaultAdvisorAutoProxyCreator;
     }
 
     @Bean
