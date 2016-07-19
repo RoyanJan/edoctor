@@ -10,7 +10,8 @@ public enum UserCode implements StatusCode {
     REGIST_SUCCESS(103),
     VERIFY_FAILURE(104),
     LOGIN_FAILURE(105),
-    LOGIN_SUCCESS(106);
+    LOGIN_SUCCESS(106),
+    LOGOUT_SUCCESS(107);
 
     private int number;
 

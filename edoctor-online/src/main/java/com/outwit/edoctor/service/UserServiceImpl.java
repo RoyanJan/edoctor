@@ -26,7 +26,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public void sendVerifyCode(String sessionId, String telephone) {
         if (redisService.isCached(sessionId) || redisService.isCached(telephone)) {
-            log.error("User session id : " + sessionId + " telephone : " + telephone + ", has send verify code repeatably .");
+            log.info("User session id : " + sessionId + " telephone : " + telephone + ", has send verify code repeatably .");
             throw new ApplicationException(UserCode.REPEAT_SEND);
         }
         String verifyCode = VerifyCodeGenerator.generatorVerifyCode();

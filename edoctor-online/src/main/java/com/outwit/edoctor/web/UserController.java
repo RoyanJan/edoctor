@@ -9,6 +9,7 @@ import com.outwit.edoctor.infrastructure.utils.PasswordHelper;
 import com.outwit.edoctor.infrastructure.utils.UUIDGenerator;
 import com.outwit.edoctor.service.UserService;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.catalina.security.SecurityUtil;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.UsernamePasswordToken;
@@ -17,9 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Date;
 
 @Slf4j
 @RestController
@@ -49,12 +48,18 @@ public class UserController {
         return new Interaction(UserCode.REGIST_SUCCESS, "Regist successfully .");
     }
 
-    @RequestMapping(path = "login", method = RequestMethod.POST)
+    @RequestMapping(path = "/login", method = RequestMethod.GET)
+    public Interaction loginInfo(){
+        return new Interaction(UserCode.LOGIN_FAILURE,"Please login again .");
+    }
+
+    @RequestMapping(path = "/login", method = RequestMethod.POST)
     public Interaction login(@ModelAttribute RegisterDTO registerDTO) {
         Subject subject = SecurityUtils.getSubject();
         UsernamePasswordToken token = new UsernamePasswordToken();
         token.setUsername(registerDTO.getTelephone());
         token.setPassword(registerDTO.getPlainTextPassword().toCharArray());
+        token.setRememberMe(true);
         try {
             subject.login(token);
             // TODO 角色信息 & 最近登录
@@ -62,6 +67,13 @@ public class UserController {
             throw new ApplicationException("Login failed !", e, UserCode.LOGIN_FAILURE);
         }
         return new Interaction(UserCode.LOGIN_SUCCESS, "Login successfully");
+    }
+
+    @RequestMapping(path = "/logout",method = RequestMethod.GET)
+    public Interaction logout(){
+        Subject subject = SecurityUtils.getSubject();
+        subject.logout();
+        return new Interaction(UserCode.LOGOUT_SUCCESS,"Logout successfully");
     }
 
     private User buildUser(RegisterDTO registerDTO) {
