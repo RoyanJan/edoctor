@@ -7,19 +7,24 @@ import com.outwit.edoctor.infrastructure.Term.Interaction;
 import com.outwit.edoctor.infrastructure.exception.ApplicationException;
 import com.outwit.edoctor.infrastructure.utils.PasswordHelper;
 import com.outwit.edoctor.infrastructure.utils.UUIDGenerator;
+import com.outwit.edoctor.infrastructure.validators.FixLength;
 import com.outwit.edoctor.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.UsernamePasswordToken;
+import org.apache.shiro.authz.annotation.RequiresUser;
 import org.apache.shiro.subject.Subject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
+import javax.validation.Valid;
 import java.time.LocalDateTime;
 
 @Slf4j
+@Validated
 @RestController
 public class UserController {
 
@@ -27,7 +32,7 @@ public class UserController {
     private UserService userService;
 
     @RequestMapping(path = "/verifyCode/{telephone}", method = RequestMethod.GET)
-    public Interaction fetchVerifyCode(HttpSession session, @PathVariable String telephone) {
+    public Interaction fetchVerifyCode(HttpSession session, @PathVariable @FixLength(length = 11) String telephone) {
         String sessionId = session.getId();
         log.debug("Session id " + sessionId + ",telephone " + telephone + " coming in ...");
         userService.sendVerifyCode(sessionId, telephone);
@@ -35,13 +40,13 @@ public class UserController {
     }
 
     @RequestMapping(path = "/user", method = RequestMethod.POST)
-    public Interaction regist(@ModelAttribute AuthenticationDTO authenticationDTO) {
-        log.debug("register vo content : " + authenticationDTO.toString());
-        if (!userService.verifyCode(authenticationDTO.getTelephone(), authenticationDTO.getVerifyCode())) {
+    public Interaction regist(@ModelAttribute @Valid RegistDTO registDTO) {
+        log.debug("register vo content : " + registDTO.toString());
+        if (!userService.verifyCode(registDTO.getTelephone(), registDTO.getVerifyCode())) {
             throw new ApplicationException(UserCode.VERIFY_FAILURE);
         }
         log.debug("verify code successfully .");
-        User user = buildUser(authenticationDTO);
+        User user = buildUser(registDTO);
         userService.createUser(user);
         log.debug("create user successfully .");
         return new Interaction(UserCode.REGIST_SUCCESS, "Regist successfully .");
@@ -53,7 +58,7 @@ public class UserController {
     }
 
     @RequestMapping(path = "/login", method = RequestMethod.POST)
-    public Interaction login(@ModelAttribute AuthenticationDTO authenticationDTO) {
+    public Interaction login(@ModelAttribute @Valid AuthenticationDTO authenticationDTO) {
         Subject subject = SecurityUtils.getSubject();
         UsernamePasswordToken token = new UsernamePasswordToken();
         token.setUsername(authenticationDTO.getTelephone());
@@ -68,6 +73,7 @@ public class UserController {
         return new Interaction(UserCode.LOGIN_SUCCESS, "Login successfully");
     }
 
+    @RequiresUser
     @RequestMapping(path = "/logout", method = RequestMethod.GET)
     public Interaction logout() {
         Subject subject = SecurityUtils.getSubject();
@@ -76,27 +82,27 @@ public class UserController {
     }
 
     @RequestMapping(path = "/user/password", method = RequestMethod.PUT)
-    public Interaction forgetPassword(@ModelAttribute AuthenticationDTO authenticationDTO) {
-        if (!userService.verifyCode(authenticationDTO.getTelephone(), authenticationDTO.getVerifyCode())) {
+    public Interaction forgetPassword(@ModelAttribute @Valid RegistDTO registDTO) {
+        if (!userService.verifyCode(registDTO.getTelephone(), registDTO.getVerifyCode())) {
             throw new ApplicationException(UserCode.VERIFY_FAILURE);
         }
         User user = new User();
-        user.setTelephone(authenticationDTO.getTelephone());
+        user.setTelephone(registDTO.getTelephone());
         String randomSalt = UUIDGenerator.generateUUID();
         user.setSalt(randomSalt);
-        user.setPassword(new PasswordHelper().encryptPassword(authenticationDTO.getPlainTextPassword() + randomSalt));
+        user.setPassword(new PasswordHelper().encryptPassword(registDTO.getPlainTextPassword() + randomSalt));
         userService.changePassword(user);
         return new Interaction(UserCode.REGIST_SUCCESS, "Change successfully");
     }
 
-    private User buildUser(AuthenticationDTO authenticationDTO) {
+    private User buildUser(RegistDTO registDTO) {
         String randomSalt = UUIDGenerator.generateUUID();
         User user = new User();
         user.setId(UUIDGenerator.generateUUID());
-        user.setTelephone(authenticationDTO.getTelephone());
+        user.setTelephone(registDTO.getTelephone());
         user.setName(user.getId());
-        user.setType(authenticationDTO.getIsUser() ? UserType.NORMAL : UserType.DOCTOR);
-        user.setPassword(new PasswordHelper().encryptPassword(authenticationDTO.getPlainTextPassword() + randomSalt));
+        user.setType(registDTO.getIsUser() ? UserType.NORMAL : UserType.DOCTOR);
+        user.setPassword(new PasswordHelper().encryptPassword(registDTO.getPlainTextPassword() + randomSalt));
         user.setSalt(randomSalt);
         user.setCreateDate(LocalDateTime.now());
         user.setLastAccess(LocalDateTime.now());

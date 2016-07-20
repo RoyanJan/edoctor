@@ -7,7 +7,8 @@ public enum SystemCode implements StatusCode {
     SUCCESS(200),
     INTERNAL_ERROR(500),
     REMOTE_PROCESS_ERROR(501),
-    UNAUTHORIZED(502);
+    UNAUTHORIZED(502),
+    PARAMETER_ERROR(503);
 
     private int number;
 

@@ -8,14 +8,16 @@ import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 
 @Data
-public class AuthenticationDTO implements Serializable {
+public class RegistDTO implements Serializable {
 
     @NotNull
     @FixLength(length = 11)
     private String telephone;
-    @NotNull
     @Length(min = 9)
     private String plainTextPassword;
+    @NotNull
+    @FixLength(length = 6)
+    private String verifyCode;
     @NotNull
     private boolean isUser;
 

@@ -54,11 +54,11 @@ public class UserServiceImpl implements UserService {
     public void createUser(User user) {
 
         if (isUserExist(user)) {
-            log.error("Telephone " + user.getTelephone() + " has already registed !");
+            log.error("FixLength " + user.getTelephone() + " has already registed !");
             throw new ApplicationException(UserCode.REPEAT_USER);
         }
         userMapper.createUser(user);
-        log.info("Telephone " + user.getTelephone() + " regist successfully .");
+        log.info("FixLength " + user.getTelephone() + " regist successfully .");
     }
 
     @Override
@@ -75,11 +75,11 @@ public class UserServiceImpl implements UserService {
     @Override
     public void changePassword(User user) {
         if (!isUserExist(user)) {
-            log.error("Telephone " + user.getTelephone() + " is not exist !");
+            log.error("FixLength " + user.getTelephone() + " is not exist !");
             throw new ApplicationException(UserCode.NOT_EXIST);
         }
         userMapper.updateUserPassword(user);
-        log.info("Telephone " + user.getTelephone() + " change password successfully .");
+        log.info("FixLength " + user.getTelephone() + " change password successfully .");
     }
 
     private boolean isUserExist(User user) {
