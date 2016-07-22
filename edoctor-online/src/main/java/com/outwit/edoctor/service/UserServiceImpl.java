@@ -37,7 +37,7 @@ public class UserServiceImpl implements UserService {
         try {
             redisService.cacheIt(telephone, verifyCode, VERIFYCODE_EXPIRE_SECONDS);
             redisService.cacheIt(sessionId, "active", VERIFYCODE_EXPIRE_SECONDS);
-            smsService.sendMessage(verifyCode);
+            smsService.sendMessage(telephone, verifyCode);
         } catch (Exception e) {
             log.error("redis server or remote sms ");
             throw new ApplicationException(SystemCode.REMOTE_PROCESS_ERROR);
