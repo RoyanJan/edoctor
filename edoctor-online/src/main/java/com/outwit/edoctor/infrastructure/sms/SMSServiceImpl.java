@@ -33,8 +33,8 @@ public class SMSServiceImpl implements SMSService {
                 log.info(key + " = " + object);
             }
         } else {
-            log.error("错误码=" + result.get("statusCode") + " 错误信息= " + result.get("statusMsg"));
-            new ApplicationException("错误码=" + result.get("statusCode") + " 错误信息= " + result.get("statusMsg"), null, SystemCode.REMOTE_PROCESS_ERROR);
+            log.error("Telephone :" +telephone + " 错误码=" + result.get("statusCode") + " 错误信息= " + result.get("statusMsg"));
+            throw new ApplicationException("错误码=" + result.get("statusCode") + " 错误信息= " + result.get("statusMsg"), null, SystemCode.REMOTE_PROCESS_ERROR);
         }
     }
 
